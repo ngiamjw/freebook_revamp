@@ -1,0 +1,15 @@
+:root {
+  --carbon-black: #1f2421;
+  --stormy-teal: #216869;
+  --seaweed: #49a078;
+  --muted-teal: #9cc5a1;
+  --alabaster-grey: #dce1de;
+
+  --bg-main: var(--alabaster-grey);
+  --text-main: var(--carbon-black);
+  --primary: var(--stormy-teal);
+  --accent: var(--seaweed);
+
+  --shadow-soft: rgba(31, 36, 33, 0.16);
+  --overlay-warm: rgba(247, 244, 237, 0.12);
+}
