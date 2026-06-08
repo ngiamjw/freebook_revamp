@@ -1,11 +1,13 @@
-import { BookExperience } from './components/BookExperience/BookExperience.jsx';
-import { NextSection } from './components/Sections/NextSection.jsx';
+import Index from "./pages/Index.jsx";
+
+import { Routes, Route, Link } from "react-router-dom";
 
 export default function App() {
   return (
     <main>
-      <BookExperience />
-      <NextSection />
+      <Routes>
+        <Route path="/" element={<Index />} />
+      </Routes>
     </main>
   );
 }
