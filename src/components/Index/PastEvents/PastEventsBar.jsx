@@ -352,7 +352,7 @@ export function PastEventsBar() {
             duration: 0.3,
             ease: "power2.out",
           })}
-          onClick={() => (window.location.href = "/past-events")}
+          // onClick={() => (window.location.href = "/past-events")}
         >
           See More
         </button>

@@ -102,7 +102,7 @@ export const pastEvents = [
 
     accent: "#2E7D32",
 
-    image: "https://placehold.co/200x300",
+    // image: "https://placehold.co/200x300",
 
     stats: {
       locations: "52 Expeditions",
@@ -116,7 +116,7 @@ export const pastEvents = [
     subtitle: "Urban exploration and culture",
     description: "Discover vibrant cityscapes, iconic landmarks, diverse cultures, and unforgettable experiences in some of the world's most dynamic urban centers.",
     accent: "#9C27B0",
-    image: "https://placehold.co/200x300",
+    // image: "https://placehold.co/200x300",
   },
   {
     id: 7,
@@ -131,7 +131,7 @@ export const pastEvents = [
     subtitle: "Thrilling outdoor activities",
     description: "Experience the ultimate adrenaline rush with unforgettable outdoor adventures that push your limits and create lasting memories.",
     accent: "#FF5722",
-    image: "https://placehold.co/200x300",
+    // image: "https://placehold.co/200x300",
   }
 ];
 

@@ -1,0 +1,269 @@
+/* ─────────────────────────────────────────
+   ProblemStatement — vertical wipe edition
+───────────────────────────────────────── */
+
+.ps-section {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+}
+
+/* books bg — left column only */
+.ps-bg {
+  position: absolute;
+  inset: 0 50% 0 0;
+  background-size: cover;
+  background-position: center;
+  z-index: 0;
+}
+
+.ps-bg-overlay {
+  position: absolute;
+  inset: 0 50% 0 0;
+  background: linear-gradient(
+    105deg,
+    rgba(6, 22, 12, 0.84) 0%,
+    rgba(6, 22, 12, 0.66) 70%,
+    rgba(6, 22, 12, 0.28) 100%
+  );
+  z-index: 1;
+}
+
+/* ── grid ── */
+.ps-container {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  min-height: 100vh;
+}
+
+/* ─────────── LEFT ─────────── */
+.ps-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 5rem 6% 5rem 8%;
+}
+
+.ps-label {
+  font-size: 0.75rem;
+  letter-spacing: 4px;
+  color: rgba(255, 255, 255, 0.45);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.ps-title {
+  margin-top: 1.2rem;
+  font-size: clamp(3rem, 5.5vw, 5.5rem);
+  line-height: 0.93;
+  color: #ffffff;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.ps-subtitle {
+  margin-top: 1.1rem;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: clamp(1.1rem, 1.6vw, 1.7rem);
+  font-weight: 400;
+  font-style: italic;
+}
+
+.ps-description {
+  margin-top: 2rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.9;
+  font-size: 1.05rem;
+  max-width: 480px;
+}
+
+.ps-btn {
+  margin-top: 2.5rem;
+  align-self: flex-start;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: transparent;
+  color: rgba(255, 255, 255, 0.85);
+  padding: 0.85rem 1.9rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+  transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+}
+
+.ps-btn:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #fff;
+}
+
+/* ─────────── RIGHT — wipe panel ─────────── */
+.ps-visual {
+  position: relative;
+  overflow: hidden;
+}
+
+.ps-img {
+  position: absolute;
+  inset: 0;
+}
+
+.ps-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.ps-img--base {
+  z-index: 1;
+}
+
+/* vertical wipe: starts fully clipped at top (inset 100% 0 0 0),
+   reveals downward as scroll reduces the top inset toward 0% */
+.ps-img--wipe {
+  z-index: 2;
+  clip-path: inset(100% 0 0 0);
+  will-change: clip-path;
+}
+
+/* horizontal line that sits at the wipe boundary */
+.ps-wipe-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0; /* JS drives this via .style.top */
+  z-index: 3;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.5);
+  pointer-events: none;
+  will-change: top;
+}
+
+/* ── minimal quote card ── */
+.ps-quote-card {
+  position: absolute;
+  bottom: 2.8rem;
+  left: 2.4rem;
+  z-index: 10;
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+
+  padding: 1.1rem 1.4rem;
+  border-left: 2px solid rgba(255, 255, 255, 0.55);
+
+  /* no background fill — let the image breathe through */
+  background: transparent;
+}
+
+.ps-card-label {
+  font-size: 0.65rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+
+.ps-card-line {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 500;
+  line-height: 1.3;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.ps-card-line--muted {
+  color: rgba(255, 255, 255, 0.55);
+  font-weight: 400;
+}
+
+/* ── scroll hint ── */
+.ps-scroll-hint {
+  position: absolute;
+  bottom: 2.8rem;
+  right: 1.8rem;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.6rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.ps-scroll-hint span {
+  display: block;
+  width: 1px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.2);
+  animation: scrollPulse 2s ease-in-out infinite;
+}
+
+@keyframes scrollPulse {
+  0%, 100% { opacity: 0.2; transform: scaleY(1);    }
+  50%       { opacity: 0.6; transform: scaleY(0.45); }
+}
+
+/* ─────────── RESPONSIVE ─────────── */
+@media (max-width: 1024px) {
+  .ps-container {
+    grid-template-columns: 1fr;
+    grid-template-rows: 55vh 45vh;
+  }
+
+  .ps-bg,
+  .ps-bg-overlay {
+    inset: 0 0 45% 0;
+  }
+
+  .ps-content {
+    padding: 4rem 6%;
+    justify-content: flex-end;
+  }
+
+  .ps-quote-card {
+    bottom: 1.4rem;
+    left: 1.6rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .ps-container {
+    grid-template-rows: 60vh 40vh;
+  }
+
+  .ps-title       { font-size: 2.8rem; }
+  .ps-subtitle    { font-size: 1.1rem; }
+  .ps-description { font-size: 0.95rem; }
+
+  .ps-card-line   { font-size: 1.05rem; }
+
+  .ps-scroll-hint { display: none; }
+}
+
+.ps-quote-card {
+  background: rgba(8, 20, 12, 0.75);
+
+  backdrop-filter: blur(12px);
+
+  border: 1px solid rgba(255,255,255,0.08);
+
+  border-left: 3px solid #d7c48a;
+
+  border-radius: 0 12px 12px 0;
+
+  padding: 1.3rem 1.5rem;
+
+  max-width: 320px;
+}
