@@ -1,0 +1,132 @@
+/* ─────────────────────────────────────────────────────
+   WhatWeDo — wipe scroller
+   All classes namespaced ws- so nothing leaks out.
+───────────────────────────────────────────────────── */
+
+/* Outer scroll-space block: n screens tall, no dead space */
+.ws-outer {
+  position: relative;
+  height: calc(var(--ws-count, 1) * 100vh);
+}
+
+/* Sticky viewport — pins for the full scroll block */
+.ws-sticky {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+}
+
+/* ── LEFT column: text ── */
+.ws-left {
+  position: relative;
+  width: 45%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0 6% 0 8%;
+  background-color: rgba(4, 49, 21, 0.28);
+}
+
+/* All text panels sit on top of each other */
+.ws-text-panel {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 6% 0 8%;
+  /* visibility controlled by GSAP autoAlpha */
+}
+
+.ws-eyebrow {
+  display: block;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: clamp(1.2rem, 1.6vw, 1.44rem);
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent, currentColor);
+  margin-bottom: 1rem;
+  opacity: 0.8;
+}
+
+.ws-headline {
+  font-size: clamp(3.6rem, 6.4vw, 6rem);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.2rem;
+}
+
+.ws-body {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: clamp(1rem, 1.8vw, 1.5rem);
+  line-height: 1.8;
+  opacity: 0.72;
+  max-width: 380px;
+}
+
+.ws-cta {
+  margin-top: 2.5rem;
+  align-self: flex-start;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: transparent;
+  padding: 0.85rem 1.9rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1.8rem;
+  letter-spacing: 0.04em;
+  transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+}
+.ws-cta:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.5);
+  color: #fff;
+}
+
+/* ── RIGHT column: images ── */
+.ws-right {
+  position: relative;
+  width: 55%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* All image panels stacked; GSAP controls y + zIndex */
+.ws-image-panel {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.ws-image-panel img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ── Mobile: stack vertically ── */
+@media (max-width: 768px) {
+  .ws-sticky { flex-direction: column; }
+
+  .ws-left {
+    width: 100%;
+    height: 45%;
+    padding: 6% 6% 0;
+  }
+  .ws-text-panel {
+    padding: 6% 6% 0;
+    justify-content: flex-end;
+  }
+
+  .ws-right {
+    width: 100%;
+    height: 55%;
+  }
+}
