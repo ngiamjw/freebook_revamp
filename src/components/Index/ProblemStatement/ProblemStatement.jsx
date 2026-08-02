@@ -53,6 +53,9 @@ export function ProblemStatement() {
           pin: true,
           scrub: 0.5,
           anticipatePin: 1,
+          // Second pinned trigger on the page. Must refresh after the book
+          // pin above it (refreshPriority 2) but before non-pinned triggers.
+          refreshPriority: 1,
         },
       });
 

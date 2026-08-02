@@ -1,3 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── shadcn / Tailwind semantic tokens ──────────────────────────────────────
+   Using --ui-* prefix to avoid conflict with the project's existing
+   --primary / --accent hex variables used by other CSS files.
+   HSL triplets (no hsl() wrapper) so Tailwind opacity modifiers work,
+   e.g. bg-primary/90 → hsl(var(--ui-primary) / 0.9).
+   Colors are derived from the existing site palette in variables.css.
+────────────────────────────────────────────────────────────────────────── */
+:root {
+  /* alabaster-grey: #dce1de → hsl(145 8% 87%) */
+  --ui-background:           145 8% 87%;
+  --ui-foreground:           142 7% 13%;   /* carbon-black */
+  --ui-card:                 145 8% 87%;
+  --ui-card-foreground:      142 7% 13%;
+  --ui-popover:              145 8% 87%;
+  --ui-popover-foreground:   142 7% 13%;
+  /* stormy-teal: #216869 → hsl(181 52% 27%) */
+  --ui-primary:              181 52% 27%;
+  --ui-primary-foreground:   145 8% 87%;
+  /* muted-teal: #9cc5a1 → hsl(127 26% 69%) */
+  --ui-secondary:            127 26% 69%;
+  --ui-secondary-foreground: 142 7% 13%;
+  --ui-muted:                145 8% 80%;
+  --ui-muted-foreground:     140 5% 30%;
+  /* seaweed: #49a078 → hsl(152 37% 46%) */
+  --ui-accent:               152 37% 46%;
+  --ui-accent-foreground:    142 7% 13%;
+  --ui-destructive:          0 84% 60%;
+  --ui-destructive-foreground: 145 8% 87%;
+  --ui-border:               145 10% 70%;
+  --ui-input:                145 10% 70%;
+  --ui-ring:                 181 52% 27%;
+  --radius:                  0.625rem;
+}
+
+.dark {
+  --ui-background:           142 7% 13%;
+  --ui-foreground:           145 8% 87%;
+  --ui-card:                 142 10% 18%;
+  --ui-card-foreground:      145 8% 87%;
+  --ui-popover:              142 10% 18%;
+  --ui-popover-foreground:   145 8% 87%;
+  --ui-primary:              127 26% 69%;   /* muted-teal is lighter on dark */
+  --ui-primary-foreground:   142 7% 13%;
+  --ui-secondary:            181 52% 27%;
+  --ui-secondary-foreground: 145 8% 87%;
+  --ui-muted:                142 10% 18%;
+  --ui-muted-foreground:     127 26% 69%;
+  --ui-accent:               152 37% 46%;
+  --ui-accent-foreground:    145 8% 87%;
+  --ui-destructive:          0 62% 40%;
+  --ui-destructive-foreground: 145 8% 87%;
+  --ui-border:               142 8% 22%;
+  --ui-input:                142 8% 22%;
+  --ui-ring:                 127 26% 69%;
+}
+
+/* ── Global base styles ─────────────────────────────────────────────────── */
 * {
   box-sizing: border-box;
 }

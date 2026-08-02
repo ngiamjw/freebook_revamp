@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(npm uninstall *)",
+      "Bash(node -e \"const l = require\\('/Users/ngiamjuwen/Desktop/freebook_garden/freebook_revamp/node_modules/lucide-react/dist/cjs/lucide-react.js'\\); console.log\\(Object.keys\\(l\\).filter\\(k => /facebook|instagram|linkedin|moon|send|sun|twitter/i.test\\(k\\)\\)\\)\")"
+    ]
+  }
+}

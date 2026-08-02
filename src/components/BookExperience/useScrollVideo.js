@@ -331,6 +331,11 @@ export function useScrollVideo({
         scrub: true,
         anticipatePin: 1,
         invalidateOnRefresh: true,
+        // This pinned trigger is highest on the page, so it must refresh
+        // before the fade-in triggers below it. Otherwise they measure their
+        // start positions before the pin-spacer is inserted and fire mid-pin.
+        // Topmost pin on the page → highest priority (refreshes first).
+        refreshPriority: 2,
         onUpdate: (self) => {
           renderProgress(clampProgress(self.progress));
         },
