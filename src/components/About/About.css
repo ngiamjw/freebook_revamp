@@ -1,0 +1,450 @@
+/* ─────────────────────────────────────────────────────
+   About — "The Reader's Record"
+   Shares the Freebook archival identity (manila board, Space Mono structure,
+   Fraunces titles, forest + rubber-stamp red, tape & ruled lines). Three
+   sections: origin entry, a stamped mission on forest, and a roster of
+   borrower's cards that flip to a bio.
+
+   All classes namespaced ab- so nothing leaks out. The flip mechanic is pure
+   CSS (transform-style: preserve-3d); React only toggles [data-flipped].
+───────────────────────────────────────────────────── */
+
+.ab-page {
+  --ab-board:    #dbcfb1;                 /* manila board — the page   */
+  --ab-slip:     #f0e9d7;                 /* lighter card paper        */
+  --ab-slip-hi:  #f7f1e3;                 /* card top edge             */
+  --ab-ink:      #23201a;                 /* warm near-black ink       */
+  --ab-ink-soft: rgba(35, 32, 26, 0.60);
+  --ab-rule:     rgba(35, 32, 26, 0.22);
+  --ab-forest:   #2f5d3a;                 /* structural accent         */
+  --ab-stamp:    #9e3f2f;                 /* rubber-stamp red          */
+  --ab-tape:     rgba(236, 226, 198, 0.62);
+
+  position: relative;
+  min-height: 100vh;
+  background: var(--ab-board);
+  color: var(--ab-ink);
+  font-family: var(--font-body);
+  padding: clamp(3.5rem, 7vh, 6rem) clamp(1.2rem, 6vw, 6rem)
+           clamp(4rem, 9vh, 8rem);
+  overflow-x: clip;
+}
+/* faint paper grain over the whole board */
+.ab-page::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+}
+.ab-page > * { position: relative; z-index: 1; }
+
+/* Back link — typed catalogue reference */
+.ab-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ab-ink-soft);
+  text-decoration: none;
+  transition: color 0.22s ease;
+}
+.ab-back:hover { color: var(--ab-stamp); }
+
+/* ── Masthead ── */
+.ab-masthead {
+  max-width: 64ch;
+  margin: clamp(1.4rem, 3.5vw, 2.4rem) 0 clamp(3rem, 7vw, 5rem);
+}
+.ab-record {
+  margin: 0 0 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ab-forest);
+}
+.ab-masthead h1 {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  font-size: clamp(2.6rem, 6.5vw, 5.2rem);
+  font-weight: 500;
+  line-height: 1.0;
+  letter-spacing: -0.02em;
+  margin: 0 0 1.1rem;
+}
+.ab-masthead h1 em { font-style: italic; font-weight: 400; color: var(--ab-forest); }
+.ab-lede {
+  margin: 0;
+  font-size: clamp(1rem, 1.15vw, 1.15rem);
+  line-height: 1.65;
+  color: var(--ab-ink-soft);
+  max-width: 56ch;
+}
+
+/* Shared section furniture ─────────────────────────────────────────── */
+.ab-eyebrow {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ab-stamp);
+}
+.ab-eyebrow--onforest { color: #e6b9a0; }
+.ab-rule {
+  display: block;
+  width: 60px;
+  height: 2px;
+  margin: 0.9rem 0 1.5rem;
+  background: var(--ab-stamp);
+  opacity: 0.85;
+}
+.ab-rule--onforest { background: #e6b9a0; }
+.ab-headline {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  font-weight: 500;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  margin: 0 0 1.4rem;
+  white-space: pre-line;
+}
+
+/* ═══ Why we started ═══════════════════════════════════════════════ */
+.ab-origin {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.85fr) 1.15fr;
+  gap: clamp(2rem, 6vw, 5rem);
+  align-items: center;
+  margin-bottom: clamp(4rem, 10vw, 8rem);
+}
+
+/* Portrait as a taped-in plate */
+.ab-origin-plate {
+  position: relative;
+  margin: 0;
+  align-self: start;
+  background: #fff;
+  padding: 0.75rem 0.75rem 0;
+  box-shadow: 0 24px 50px -24px rgba(35, 32, 26, 0.6);
+  transform: rotate(-1.6deg);
+}
+.ab-origin-photo {
+  aspect-ratio: 4 / 5;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 90% at 30% 20%, #3a6f48, #234030 70%);
+}
+.ab-origin-photo .ab-monogram { font-size: clamp(3rem, 7vw, 5rem); color: #f4ecd8; }
+.ab-origin-plate figcaption {
+  padding: 0.7rem 0.2rem 0.85rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  color: var(--ab-ink-soft);
+}
+
+.ab-origin-body { max-width: 56ch; }
+.ab-prose {
+  font-size: clamp(1rem, 1.2vw, 1.12rem);
+  line-height: 1.78;
+  color: var(--ab-ink);
+  margin: 0 0 1.2rem;
+}
+.ab-signature {
+  margin: 1.6rem 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ab-forest);
+}
+
+/* ═══ Our mission (forest panel) ═══════════════════════════════════ */
+.ab-mission {
+  position: relative;
+  background: var(--ab-forest);
+  color: #f4f0e6;
+  border-radius: 4px;
+  padding: clamp(2.4rem, 6vw, 4.5rem) clamp(1.6rem, 6vw, 5rem);
+  margin-bottom: clamp(4rem, 10vw, 8rem);
+  box-shadow: 0 30px 60px -30px rgba(35, 32, 26, 0.7);
+  overflow: hidden;
+}
+/* grain over the panel */
+.ab-mission::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+}
+.ab-mission > * { position: relative; z-index: 1; }
+
+.ab-mission-statement {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  font-size: clamp(1.7rem, 3.4vw, 3rem);
+  font-weight: 500;
+  line-height: 1.18;
+  letter-spacing: -0.015em;
+  margin: 0 0 clamp(2.4rem, 5vw, 3.5rem);
+  max-width: 24ch;
+}
+
+.ab-principles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: clamp(1.6rem, 4vw, 2.6rem);
+  margin: 0;
+  padding-top: clamp(1.6rem, 4vw, 2.4rem);
+  border-top: 1px solid rgba(244, 240, 230, 0.24);
+}
+.ab-principle dt {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, 1.8vw, 1.4rem);
+  font-weight: 600;
+  margin-bottom: 0.6rem;
+}
+.ab-principle-no {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #e6b9a0;
+}
+.ab-principle dd {
+  margin: 0;
+  font-size: 0.96rem;
+  line-height: 1.65;
+  color: rgba(244, 240, 230, 0.78);
+}
+
+/* ═══ Meet the team ═══════════════════════════════════════════════ */
+.ab-team-head { max-width: 60ch; margin-bottom: clamp(2rem, 5vw, 3.2rem); }
+.ab-team-note {
+  margin: 0.4rem 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ab-ink-soft);
+}
+
+.ab-team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: clamp(1.4rem, 3.5vw, 2.4rem);
+}
+
+/* ── Flip card ── */
+.ab-card {
+  --card-accent: var(--ab-forest);
+  perspective: 1400px;
+  height: 380px;
+}
+.ab-card[data-accent="red"] { --card-accent: var(--ab-stamp); }
+
+.ab-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  transform-style: preserve-3d;
+  transition: transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+  border-radius: 4px;
+}
+.ab-card-inner:focus-visible {
+  outline: 2.5px solid var(--card-accent);
+  outline-offset: 4px;
+}
+@media (hover: hover) {
+  .ab-card:hover .ab-card-inner { transform: rotateY(180deg); }
+}
+.ab-card[data-flipped="true"] .ab-card-inner { transform: rotateY(180deg); }
+
+/* Faces */
+.ab-face {
+  position: absolute;
+  inset: 0;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Front — monogram plate + name plate */
+.ab-front {
+  background: linear-gradient(180deg, var(--ab-slip-hi), var(--ab-slip) 24%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.5) inset,
+    0 18px 40px -22px rgba(35, 32, 26, 0.55);
+}
+.ab-photo {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+  background: radial-gradient(120% 90% at 30% 20%, #3a6f48, #234030 72%);
+}
+.ab-card[data-accent="red"] .ab-photo {
+  background: radial-gradient(120% 90% at 30% 20%, #b8503f, #7f2f24 72%);
+}
+.ab-photo img { width: 100%; height: 100%; object-fit: cover; }
+.ab-monogram {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 3.4rem;
+  letter-spacing: 0.02em;
+  color: #f4ecd8;
+}
+/* strip of tape holding the plate at the top */
+.ab-tape {
+  position: absolute;
+  top: -10px;
+  left: 24px;
+  width: 88px;
+  height: 24px;
+  transform: rotate(-6deg);
+  background: var(--ab-tape);
+  box-shadow: 0 1px 3px rgba(35, 32, 26, 0.18);
+  z-index: 2;
+}
+.ab-tape--plate { top: -12px; left: 30px; width: 96px; }
+
+.ab-front-meta {
+  position: relative;
+  padding: 0.9rem 1.1rem 1.1rem;
+  border-top: 2px solid var(--card-accent);
+}
+.ab-badge {
+  display: inline-block;
+  margin-bottom: 0.45rem;
+  padding: 0.2rem 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--card-accent);
+  border: 1.5px solid var(--card-accent);
+  border-radius: 3px;
+}
+.ab-name {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 600;
+  line-height: 1.1;
+  margin: 0 0 0.15rem;
+  color: var(--ab-ink);
+}
+.ab-role {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ab-ink-soft);
+}
+.ab-flip-hint {
+  position: absolute;
+  top: 0.7rem;
+  right: 0.8rem;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(244, 236, 216, 0.8);
+  z-index: 2;
+}
+
+/* Back — the bio slip */
+.ab-back {
+  transform: rotateY(180deg);
+  background: var(--card-accent);
+  color: #f4f0e6;
+  padding: 1.4rem 1.3rem;
+  justify-content: space-between;
+}
+.ab-back::before {
+  content: "";
+  position: absolute;
+  top: 1rem;
+  bottom: 1rem;
+  left: 0.8rem;
+  width: 1.5px;
+  background: rgba(244, 240, 230, 0.4);
+}
+.ab-back-label {
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(244, 240, 230, 0.72);
+  padding-left: 0.7rem;
+}
+.ab-bio {
+  margin: 0;
+  padding-left: 0.7rem;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #f6f2e8;
+}
+.ab-back-name {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding-left: 0.7rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid rgba(244, 240, 230, 0.3);
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+.ab-back-name em {
+  font-family: var(--font-mono);
+  font-style: normal;
+  font-size: 0.66rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(244, 240, 230, 0.72);
+}
+
+/* ═══ Responsive ══════════════════════════════════════════════════ */
+@media (max-width: 780px) {
+  .ab-origin { grid-template-columns: 1fr; gap: 2.5rem; }
+  .ab-origin-plate { width: min(320px, 78%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ab-card-inner { transition: none; }
+  .ab-back { transition: opacity 0.2s ease; }
+}

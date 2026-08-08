@@ -12,4 +12,19 @@
 
   --shadow-soft: rgba(31, 36, 33, 0.16);
   --overlay-warm: rgba(247, 244, 237, 0.12);
+
+  /* ── Revamp "paper & ink" brand palette (2026 direction) ─────────────
+     Warm literary scheme drawn from the Freebook logo (red heart + green
+     book). One calm neutral; colour comes from photography + a single
+     red accent used sparingly. Currently applied in WhatWeDo; intended
+     to roll out site-wide. */
+  --fb-paper:  #f7f3ec;  /* single calm background            */
+  --fb-ink:    #1a1a17;  /* headlines + body                  */
+  --fb-red:    #c63a2f;  /* accent: eyebrows, CTA, underlines */
+  --fb-forest: #2f5d3a;  /* secondary deep accent             */
+  --fb-muted:  rgba(26, 26, 23, 0.62);  /* body copy         */
+
+  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-body:    "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono:    "Space Mono", ui-monospace, SFMono-Regular, "SF Mono", monospace;
 }

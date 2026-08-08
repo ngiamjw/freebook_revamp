@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
-import defaultImage from "/src/pictures/logo_white_bg.jpg"
+import defaultImage from "/src/pictures/logo_white_bg.jpg";
 
 export default function ShowcaseCard({
   card,
@@ -19,14 +19,14 @@ export default function ShowcaseCard({
     gsap.killTweensOf(imageRef.current);
 
     gsap.to(cardRef.current, {
-      y: active ? -10 : 0,
-      duration: 0.25,
+      y: active ? -6 : 0,
+      duration: 0.3,
       ease: "power2.out",
     });
 
     gsap.to(imageRef.current, {
-      scale: active ? 1.08 : 1,
-      duration: 0.25,
+      scale: active ? 1.05 : 1,
+      duration: 0.5,
       ease: "power2.out",
     });
   }, [active]);
@@ -39,7 +39,7 @@ export default function ShowcaseCard({
       onMouseLeave={onMouseLeave}
       onClick={(e) => onClick(card, e.currentTarget)}
     >
-      <div className="image-wrapper">
+      <div className="card-image-frame">
         <img
           ref={imageRef}
           src={card.image || defaultImage}
@@ -50,10 +50,11 @@ export default function ShowcaseCard({
           draggable="false"
           className="card-image"
         />
+      </div>
 
-        <h2 className="overlay-title">
-          {card.title}
-        </h2>
+      <div className="card-meta">
+        {card.date && <span className="card-date">{card.date}</span>}
+        <h3 className="card-title">{card.title}</h3>
       </div>
     </div>
   );

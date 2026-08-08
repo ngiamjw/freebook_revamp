@@ -93,7 +93,7 @@ export default function EventModal({
         </button>
         
         <img
-          src={event.image | defaultImage}
+          src={event.image || defaultImage}
           alt={event.title}
           onError={(e) => {
             e.currentTarget.src = defaultImage;

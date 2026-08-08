@@ -10,6 +10,22 @@ function getPrefersReducedMotion() {
   return window.matchMedia('(prefers-reduced-motion: reduce)');
 }
 
+function resolveScrollLength(scrollLength) {
+  return typeof scrollLength === 'function' ? scrollLength() : scrollLength;
+}
+
+// Run non-urgent work (the frame-cache build) once the browser is idle so it
+// never competes with first paint / page startup. Returns a canceller.
+function runWhenIdle(callback) {
+  if (typeof window.requestIdleCallback === 'function') {
+    const id = window.requestIdleCallback(callback, { timeout: 1000 });
+    return () => window.cancelIdleCallback(id);
+  }
+
+  const id = window.setTimeout(callback, 200);
+  return () => window.clearTimeout(id);
+}
+
 function getVideoDuration(video) {
   return Number.isFinite(video.duration) ? video.duration : 0;
 }
@@ -179,6 +195,7 @@ export function useScrollVideo({
     let resizeObserver = null;
     let drawFrame = null;
     let seekFrame = null;
+    let cancelIdle = null;
     let isFrameCacheReady = false;
     let latestProgress = 0;
     let lastAppliedTime = Number.NaN;
@@ -199,6 +216,11 @@ export function useScrollVideo({
     };
 
     const cancelPendingWork = () => {
+      if (cancelIdle !== null) {
+        cancelIdle();
+        cancelIdle = null;
+      }
+
       if (drawFrame !== null) {
         cancelAnimationFrame(drawFrame);
         drawFrame = null;
@@ -326,7 +348,7 @@ export function useScrollVideo({
         id: 'book-opening-scroll-video',
         trigger: section,
         start: 'top top',
-        end: () => `+=${config.scrollLength}`,
+        end: () => `+=${resolveScrollLength(config.scrollLength)}`,
         pin: true,
         scrub: true,
         anticipatePin: 1,
@@ -354,18 +376,42 @@ export function useScrollVideo({
       }
 
       resizeCanvas(canvas, section, config);
-      drawVideoFrameToCanvas();
 
-      const cachedFrames = await buildFrameCache(video, config, () => hasCleanedUp);
+      // Draw the real first frame ASAP so the hero is visible immediately,
+      // rather than a black canvas while the full cache builds. A single seek
+      // to 0 is cheap; the 48-seek build below is what used to stall startup.
+      const duration = getVideoDuration(video);
+      if (duration > 0) {
+        await seekVideo(video, 0);
+      }
 
       if (hasCleanedUp) {
-        closeFrameCache(cachedFrames);
         return;
       }
 
-      frames.push(...cachedFrames);
-      isFrameCacheReady = frames.length > 0;
-      renderFrameAtProgress(latestProgress);
+      drawVideoFrameToCanvas();
+
+      // Defer the expensive seek/decode loop off the critical path. Until it
+      // resolves, scrolling reports progress and the canvas holds the first
+      // frame; scrubbing becomes frame-accurate once the cache is ready.
+      cancelIdle = runWhenIdle(async () => {
+        cancelIdle = null;
+
+        if (hasCleanedUp) {
+          return;
+        }
+
+        const cachedFrames = await buildFrameCache(video, config, () => hasCleanedUp);
+
+        if (hasCleanedUp) {
+          closeFrameCache(cachedFrames);
+          return;
+        }
+
+        frames.push(...cachedFrames);
+        isFrameCacheReady = frames.length > 0;
+        renderFrameAtProgress(latestProgress);
+      });
     };
 
     const setupAfterMetadata = () => {

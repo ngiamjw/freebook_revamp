@@ -1,361 +1,100 @@
-import { useRef, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import "./PastEventsBar.css";
 import { introContent, pastEvents } from "../../../data/PastEventsBar.js";
-import ShowcaseCard from "./ShowcaseCard.jsx";
-import EventModal from "./EventModal.jsx";
 
 gsap.registerPlugin(ScrollTrigger);
 
+/**
+ * PastEventsBar — "The Archive" teaser (homepage).
+ * Editorial index + live preview: a list of past events on the left; one large
+ * image on the right that cross-fades to whichever row is active (hover on
+ * desktop). A button leads to the full /past-events page. No card/tape motif.
+ */
 export function PastEventsBar() {
-  const isMobile = Math.min(window.innerWidth, window.innerHeight) <= 768;
-  
-  const wrapperRef = useRef();
-  const dragDistanceRef = useRef(0);
-  const isTouchingRef = useRef(false);
-  const buttonRef = useRef(null);
-  const isCenteringRef = useRef(false);
-
-  const [activeCard, setActiveCard] = useState(null);
-  const [selectedEvent, setSelectedEvent] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false);
-
-  const centerCardAndOpen = (
-    cardElement,
-    eventData
-  ) => {
-    const container = wrapperRef.current;
-
-    if (!container || !cardElement) return;
-
-    const maxScroll =
-      container.scrollWidth -
-      container.clientWidth;
-
-    const idealTarget =
-      cardElement.offsetLeft -
-      container.clientWidth / 2 +
-      cardElement.clientWidth / 2;
-
-    const target = Math.max(
-      0,
-      Math.min(idealTarget, maxScroll)
-    );
-
-    const distance = Math.abs(
-      target - container.scrollLeft
-    );
-
-    if (distance < 50) {
-      setSelectedEvent(eventData);
-      return;
-    }
-
-    isCenteringRef.current = true;
-
-    gsap.to(container, {
-      scrollLeft: target,
-      duration: 0.8,
-      ease: "expo.out",
-
-      onComplete: () => {
-        isCenteringRef.current = false;
-        setSelectedEvent(eventData);
-      },
-    });
-  };
-
-  const snapToNearestCard = () => {
-    if (isCenteringRef.current) return;
-    const wrapper = wrapperRef.current;
-
-    if (!wrapper) return;
-
-    const intro =
-      wrapper.querySelector(".events-intro");
-
-    if (intro) {
-      const snapStart =
-        intro.offsetWidth * 0.75;
-
-      if (wrapper.scrollLeft < snapStart) {
-        return;
-      }
-    }
-
-    const cards =
-      wrapper.querySelectorAll(".card");
-
-    const wrapperCenter =
-      wrapper.scrollLeft +
-      wrapper.clientWidth / 2;
-
-    let nearestCard = null;
-    let nearestDistance = Infinity;
-
-    cards.forEach((card) => {
-      const cardCenter =
-        card.offsetLeft +
-        card.offsetWidth / 2;
-
-      const distance = Math.abs(
-        wrapperCenter - cardCenter
-      );
-
-      if (distance < nearestDistance) {
-        nearestDistance = distance;
-        nearestCard = card;
-      }
-    });
-
-    if (
-      !nearestCard ||
-      nearestDistance < 20
-    ) {
-      return;
-    }
-
-    gsap.to(wrapper, {
-      scrollLeft:
-        nearestCard.offsetLeft -
-        wrapper.clientWidth / 2 +
-        nearestCard.offsetWidth / 2,
-
-      duration: 0.5,
-      ease: "power2.out",
-      overwrite: true,
-    });
-  };
-
-  useEffect(() => {
-    const wrapper = wrapperRef.current;
-
-    if (!wrapper) return;
-
-    let isDragging = false;
-    let startX = 0;
-    let startScrollLeft = 0;
-
-    const handlePointerDown = (e) => {
-      gsap.killTweensOf(wrapper);
-
-      isDragging = true;
-      isTouchingRef.current = true;
-
-      dragDistanceRef.current = 0;
-
-      startX = e.clientX;
-      startScrollLeft = wrapper.scrollLeft;
-
-      wrapper.classList.add("dragging");
-    };
-
-    const handlePointerMove = (e) => {
-      if (!isDragging) return;
-
-      const delta =
-        e.clientX - startX;
-
-      dragDistanceRef.current =
-        Math.abs(delta);
-
-      gsap.set(wrapper, {
-        scrollLeft:
-          startScrollLeft - delta,
-      });
-    };
-
-    const handlePointerUp = () => {
-      if (!isDragging) return;
-
-      isDragging = false;
-      isTouchingRef.current = false;
-
-      wrapper.classList.remove("dragging");
-
-      setTimeout(() => {
-        snapToNearestCard();
-      }, 150);
-    };
-
-    wrapper.addEventListener(
-      "pointerdown",
-      handlePointerDown
-    );
-
-    window.addEventListener(
-      "pointermove",
-      handlePointerMove
-    );
-
-    window.addEventListener(
-      "pointerup",
-      handlePointerUp
-    );
-
-    return () => {
-      wrapper.removeEventListener(
-        "pointerdown",
-        handlePointerDown
-      );
-
-      window.removeEventListener(
-        "pointermove",
-        handlePointerMove
-      );
-
-      window.removeEventListener(
-        "pointerup",
-        handlePointerUp
-      );
-    };
-}, []);
+  const [active, setActive] = useState(0);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: ".past-events-bar",
-          start: "top 75%",
-          once: true,
-        },
+      // Header: clean reveal on enter.
+      gsap.from(".pe-head-el", {
+        scrollTrigger: { trigger: ".pe-section", start: "top 78%", once: true },
+        opacity: 0, y: 24, duration: 0.7, stagger: 0.1, ease: "power2.out",
       });
-
-      tl.from(".events-intro", {
-        opacity: 0,
-        y: 20,
-        duration: 0.8,
-        ease: "power2.out",
+      // Preview image scales in.
+      gsap.from(".pe-preview-wrap", {
+        scrollTrigger: { trigger: ".pe-section", start: "top 72%", once: true },
+        opacity: 0, scale: 1.05, duration: 1, ease: "power2.out",
       });
-
-      tl.from(
-        ".card",
-        {
-          opacity: 0,
-          y: 30,
-          duration: 0.7,
-          stagger: 0.08,
-          ease: "power2.out",
-        },
-        "-=0.4"
-      );
-
-      tl.from(
-        ".more-events-button",
-        {
-          opacity: 0,
-          y: 10,
-          scale: 0.95,
-          duration: 0.5,
-          ease: "power2.out",
-        },
-        "-=0.2"
-      );
+      // Rows rise as you scroll into the section (motion tied to scroll).
+      gsap.from(".pe-row", {
+        scrollTrigger: { trigger: ".pe-index", start: "top 82%", end: "top 42%", scrub: true },
+        opacity: 0, y: 44, stagger: 0.2, ease: "none",
+      });
     });
-
     return () => ctx.revert();
   }, []);
 
-  useEffect(() => {
-    const wrapper = wrapperRef.current;
-    let snapTimeout;
-
-    if (!wrapper) return;
-
-    const handleScroll = () => {
-      if (isCenteringRef.current) return;
-      clearTimeout(snapTimeout);
-
-      snapTimeout = setTimeout(() => {
-        snapToNearestCard();
-      }, 350);
-    };
-
-    wrapper.addEventListener(
-      "scroll",
-      handleScroll
-    );
-
-    return () => {
-      wrapper.removeEventListener(
-        "scroll",
-        handleScroll
-      );
-    };
-  }, []);
-
-  useEffect(() => {
-    document.body.style.overflow =
-      selectedEvent ? "hidden" : "";
-
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [selectedEvent]);
-  
-  useEffect(() => {
-    const container = wrapperRef.current;
-
-    if (!container) return;
-
-    // container.scrollLeft = isMobile
-    //   ? container.clientWidth * 0.6
-    //   : container.clientWidth * 0.4;
-    container.scrollLeft = 0;
-  }, []);
-
   return (
-    <section className="past-events-bar" aria-label="Past events highlights">
-      <div ref={wrapperRef} className="cards-scroll-region">
-        <div className="cards-wrapper">
-          <div className = "events-intro">
-            <h2>{introContent.title}</h2>
-            <p>{introContent.body}</p>
-          </div>
-          {pastEvents.map((event) => (
-            <ShowcaseCard
-              key={event.id}
-              card={event}
-              active={activeCard === event.id}
-              onMouseEnter={() => setActiveCard(event.id)}
-              onMouseLeave={() => setActiveCard(null)}
-              onClick={(card, element) => {
-                if (dragDistanceRef.current > 10) {
-                  dragDistanceRef.current = 0;
-                  return;
-                }
+    <section className="pe-section" aria-label="Past events">
+      <div className="pe-inner">
+        <header className="pe-head">
+          <span className="pe-marker pe-head-el">
+            <span className="pe-marker-rule" aria-hidden="true" />
+            {introContent.marker}
+          </span>
+          <h2 className="pe-title pe-head-el">{introContent.title}</h2>
+        </header>
 
-                centerCardAndOpen(element, card);
-              }}
-            />
-          ))}
+        <div className="pe-grid">
+          {/* Left: the index */}
+          <ol className="pe-index">
+            {pastEvents.map((ev, i) => (
+              <li
+                key={ev.id}
+                className="pe-row"
+                data-active={active === i}
+                onMouseEnter={() => setActive(i)}
+                onFocus={() => setActive(i)}
+                tabIndex={0}
+              >
+                {/* inline image — shown on mobile only */}
+                <div className="pe-row-img">
+                  <img src={ev.image} alt={ev.alt ?? ""} loading="lazy"
+                    style={{ objectPosition: ev.imagePos ?? "center center" }} />
+                </div>
+                <span className="pe-row-date">{ev.date}</span>
+                <div className="pe-row-main">
+                  <h3 className="pe-row-title">{ev.title}</h3>
+                  {ev.place && <span className="pe-row-place">{ev.place}</span>}
+                </div>
+                <span className="pe-row-arrow" aria-hidden="true">→</span>
+              </li>
+            ))}
+          </ol>
+
+          {/* Right: live preview — cross-fading stack */}
+          <div className="pe-preview-wrap" aria-hidden="true">
+            {pastEvents.map((ev, i) => (
+              <img
+                key={ev.id}
+                className="pe-preview"
+                src={ev.image}
+                alt=""
+                data-active={active === i}
+                loading="lazy"
+                style={{ objectPosition: ev.imagePos ?? "center center" }}
+              />
+            ))}
+          </div>
         </div>
-      </div>
-      
-      <EventModal
-        event={selectedEvent}
-        onClose={() => setSelectedEvent(null)}
-      />
-      <div className="more-events-container">
-        <button
-          ref={buttonRef}
-          className="more-events-button"
-          onMouseEnter={() => gsap.to(buttonRef.current, {
-            scale: 1.05,
-            duration: 0.3,
-            ease: "power2.out",
-          })}
-          onMouseLeave={() => gsap.to(buttonRef.current, {
-            scale: 1,
-            duration: 0.3,
-            ease: "power2.out",
-          })}
-          // onClick={() => (window.location.href = "/past-events")}
-        >
-          See More
-        </button>
+
+        <div className="pe-cta-row">
+          <Link to="/past-events" className="pe-cta">Open the full archive →</Link>
+        </div>
       </div>
     </section>
   );

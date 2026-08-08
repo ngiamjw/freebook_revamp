@@ -77,7 +77,7 @@ export function CinematicLogoCloud({
         <span
           className={cn(
             size === "lg"
-              ? "text-xl font-bold text-zinc-900 dark:text-white"
+              ? "font-[family-name:var(--font-display)] text-2xl font-semibold text-[color:var(--fb-ink)]"
               : "text-sm font-semibold text-zinc-700 dark:text-zinc-300",
             client.className,
           )}
@@ -171,16 +171,18 @@ export function CinematicLogoCloud({
     <div
       ref={sectionRef}
       className={cn(
-        "flex min-h-screen w-full items-center bg-zinc-50/50 dark:bg-zinc-950",
+        "flex min-h-screen w-full items-center bg-[var(--fb-paper)]",
         className,
       )}
     >
       <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-        <p className="text-sm font-semibold uppercase tracking-widest text-zinc-400">
+        <p className="font-[family-name:var(--font-body)] text-[0.8rem] font-semibold uppercase tracking-[0.24em] text-[color:var(--fb-red)]">
           {eyebrow}
         </p>
         {description && (
-          <p className="mt-2 text-sm text-zinc-500">{description}</p>
+          <p className="mt-4 font-[family-name:var(--font-body)] text-base text-[color:var(--fb-muted)]">
+            {description}
+          </p>
         )}
 
         <div className="mt-16 flex flex-wrap items-center justify-center gap-x-10 gap-y-12">

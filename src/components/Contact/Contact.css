@@ -1,0 +1,389 @@
+/* ─────────────────────────────────────────────────────
+   Contact — "The Lending Card"
+   A book-donation charity's contact form as an old library
+   accession / lending card, floating over dimmed documentary
+   photography. Signature: ruled-line inputs + a red rubber
+   stamp that thuds down as the success state.
+
+   All classes namespaced c- so nothing leaks out.
+───────────────────────────────────────────────────── */
+
+.c-page {
+  /* ── Card palette (manila paper & ink), scoped to this page ── */
+  --paper:      #e7d8ba;                 /* manila card stock          */
+  --paper-hi:   #efe3c9;                 /* lighter top edge           */
+  --ink:        #2b2419;                 /* warm typewriter ink        */
+  --ink-soft:   rgba(43, 36, 25, 0.56);
+  --rule:       rgba(43, 36, 25, 0.26);  /* ruled underlines           */
+  --stamp-red:  #b0392c;                 /* rubber-stamp / header red  */
+  --margin-red: #c56a5b;                 /* ledger margin line         */
+
+  position: relative;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: clamp(4.5rem, 9vh, 7rem) 1.1rem clamp(3rem, 6vh, 5rem);
+  font-family: var(--font-body);
+  color: var(--ink);
+  overflow: hidden;
+}
+
+/* ── Documentary photo backdrop, dimmed under an ink/forest scrim ── */
+.c-backdrop {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: brightness(0.42) saturate(0.9) blur(1px);
+  transform: scale(1.05);              /* hide blur edge bleed */
+  z-index: 0;
+}
+.c-backdrop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  /* deep forest-ink wash so the manila card pops warm against it */
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(20, 34, 24, 0.35), transparent 60%),
+    linear-gradient(180deg, rgba(18, 22, 17, 0.55), rgba(14, 18, 14, 0.78));
+}
+
+/* Back link, top-left over the photo */
+.c-back {
+  position: absolute;
+  top: clamp(1.2rem, 3vw, 2rem);
+  left: clamp(1.2rem, 4vw, 3rem);
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(238, 232, 220, 0.72);
+  text-decoration: none;
+  transition: color 0.22s ease;
+}
+.c-back:hover { color: #fff; }
+
+/* ── The card ─────────────────────────────────────────────────── */
+.c-card {
+  position: relative;
+  z-index: 1;
+  width: min(94vw, 640px);
+  background:
+    linear-gradient(180deg, var(--paper-hi), var(--paper) 22%);
+  color: var(--ink);
+  border-radius: 3px;
+  padding: clamp(1.6rem, 4vw, 2.6rem) clamp(1.5rem, 4.5vw, 3rem)
+           clamp(1.8rem, 4vw, 2.4rem);
+  padding-left: clamp(2.2rem, 6vw, 3.8rem);   /* room for the margin rule */
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.5) inset,
+    0 30px 60px -18px rgba(0, 0, 0, 0.6),
+    0 8px 20px rgba(0, 0, 0, 0.35);
+  transform: rotate(-0.5deg);
+}
+
+/* Paper grain */
+.c-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0.5;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
+}
+/* Red ledger margin rule down the left */
+.c-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: clamp(1.3rem, 4vw, 2.4rem);
+  width: 1.5px;
+  background: var(--margin-red);
+  opacity: 0.55;
+}
+
+/* Punched hole at the top */
+.c-hole {
+  position: absolute;
+  top: -11px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 42px;
+  height: 22px;
+  border-radius: 0 0 22px 22px;
+  background: rgba(0, 0, 0, 0.28);
+  box-shadow: inset 0 -2px 3px rgba(0, 0, 0, 0.4);
+}
+.c-hole::after {
+  content: "";
+  position: absolute;
+  top: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(20, 24, 18, 0.85);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+/* ── Card header ── */
+.c-head {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.7rem;
+  border-bottom: 2px solid var(--stamp-red);
+}
+.c-head::after {                          /* the thin second rule of a double line */
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -5px;
+  height: 1px;
+  background: var(--stamp-red);
+  opacity: 0.5;
+}
+.c-wordmark {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.c-accession {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  text-align: right;
+  line-height: 1.5;
+}
+
+/* Card title (retitles per mode) + one line of intro */
+.c-title {
+  margin: 1.3rem 0 0.15rem;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: clamp(1.05rem, 2.4vw, 1.35rem);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.c-intro {
+  margin: 0 0 1.4rem;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  max-width: 44ch;
+}
+
+/* ── Catalogue-tab toggle ─────────────────────────────────────── */
+.c-tabs {
+  display: flex;
+  gap: 0.4rem;
+  margin: 0 0 1.7rem;
+  border-bottom: 1.5px solid var(--rule);
+}
+.c-tab {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 0.55rem 0.9rem;
+  margin-bottom: -1.5px;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  cursor: pointer;
+  border-bottom: 2.5px solid transparent;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+.c-tab:hover { color: var(--ink); }
+.c-tab[data-active="true"] {
+  color: var(--stamp-red);
+  border-bottom-color: var(--stamp-red);
+}
+
+/* ── Ruled-line fields ────────────────────────────────────────── */
+.c-field { margin-bottom: 1.25rem; }
+
+.c-label {
+  display: block;
+  margin-bottom: 0.15rem;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.c-line,
+.c-linearea {
+  width: 100%;
+  border: 0;
+  border-bottom: 1.5px solid var(--rule);
+  background: transparent;
+  padding: 0.4rem 0.1rem;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--ink);
+  transition: border-color 0.2s ease;
+}
+.c-linearea { resize: vertical; min-height: 2.2rem; line-height: 1.5; }
+.c-line::placeholder,
+.c-linearea::placeholder { color: rgba(43, 36, 25, 0.32); }
+.c-line:focus,
+.c-linearea:focus {
+  outline: none;
+  border-bottom-color: var(--stamp-red);
+  border-bottom-width: 2px;
+}
+/* Native date/select adopt the ink look */
+.c-line[type="date"] { color: var(--ink); }
+select.c-line {
+  appearance: none;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%232b2419' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.2rem center;
+  padding-right: 1.6rem;
+}
+
+.c-field[data-invalid="true"] .c-line,
+.c-field[data-invalid="true"] .c-linearea {
+  border-bottom-color: var(--stamp-red);
+}
+.c-error {
+  margin: 0.35rem 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.02em;
+  color: var(--stamp-red);
+}
+
+/* two-up row */
+.c-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem; }
+
+/* Handover radios, typed style: ( ) pickup  ( ) drop-off */
+.c-radios { display: flex; gap: 1.4rem; padding-top: 0.35rem; }
+.c-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  cursor: pointer;
+}
+.c-radio input { accent-color: var(--stamp-red); width: 1rem; height: 1rem; }
+
+/* Consent — a ticked box on the card */
+.c-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin: 1.6rem 0 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  line-height: 1.55;
+  letter-spacing: 0.01em;
+  color: var(--ink-soft);
+}
+.c-consent input {
+  margin-top: 0.1rem;
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--stamp-red);
+  flex-shrink: 0;
+}
+.c-consent[data-invalid="true"] { color: var(--stamp-red); }
+
+/* ── Submit ("STAMP & SEND") ─────────────────────────────────── */
+.c-send {
+  appearance: none;
+  border: 0;
+  width: 100%;
+  padding: 0.85rem 1.5rem;
+  background: var(--ink);
+  color: var(--paper-hi);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: background 0.22s ease, transform 0.12s ease;
+}
+.c-send:hover { background: var(--stamp-red); }
+.c-send:active { transform: translateY(1px); }
+
+/* ── The rubber stamp (success) ──────────────────────────────── */
+.c-stamp {
+  position: absolute;
+  top: 16%;
+  right: 6%;
+  z-index: 4;
+  padding: 0.5rem 0.9rem 0.4rem;
+  border: 3px solid var(--stamp-red);
+  border-radius: 4px;
+  color: var(--stamp-red);
+  text-align: center;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  transform: rotate(-13deg);
+  mix-blend-mode: multiply;            /* ink soaks into the paper */
+  pointer-events: none;
+  /* frayed rubber-stamp edge */
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='r'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.12' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 -1.4 1.2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23r)'/%3E%3C/svg%3E");
+  -webkit-mask-composite: source-over;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='r'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.12' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 -1.4 1.2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23r)'/%3E%3C/svg%3E");
+}
+.c-stamp-lg { display: block; font-weight: 700; font-size: 1.35rem; letter-spacing: 0.06em; line-height: 1.05; }
+.c-stamp-sm { display: block; font-size: 0.6rem; letter-spacing: 0.14em; margin-top: 0.2rem; }
+
+/* Confirmation line replacing the button after stamping */
+.c-confirm {
+  margin-top: 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  line-height: 1.6;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+}
+.c-confirm a {
+  color: var(--stamp-red);
+  text-decoration: none;
+  border-bottom: 1.5px solid currentColor;
+}
+
+.c-filed { pointer-events: none; opacity: 0.9; }   /* card locks after filing */
+
+/* ── Mobile ───────────────────────────────────────────────────── */
+@media (max-width: 560px) {
+  .c-row { grid-template-columns: 1fr; gap: 0; }
+  .c-card { transform: none; }
+  .c-stamp { top: 10%; right: 4%; }
+  .c-stamp-lg { font-size: 1.05rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .c-back, .c-tab, .c-send, .c-line, .c-linearea { transition: none; }
+}

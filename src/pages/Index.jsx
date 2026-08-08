@@ -21,7 +21,13 @@ const partners = [
 
 export default function Index() {
   return (
-    <>
+    // Single wrapper element (not a fragment) is required: several children
+    // below pin with GSAP ScrollTrigger, which wraps them in `pin-spacer`
+    // divs. On route change React removes only this ONE top-level node from
+    // <main>; without it, React tries to removeChild each pinned <section>
+    // directly — but GSAP has re-parented them into pin-spacers, so the
+    // removal throws "node to be removed is not a child of this node".
+    <div className="index-page">
         <BookExperience />
         <ProblemStatement />
         <WhatWeDo />
@@ -32,6 +38,6 @@ export default function Index() {
           description="Together, bringing free books to every corner of the community."
         />
         <Footerdemo />
-    </>
+    </div>
   );
 }
